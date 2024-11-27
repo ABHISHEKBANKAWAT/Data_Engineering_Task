@@ -1,93 +1,91 @@
-
 import pandas as pd
-from pyspark.sql import Column
-from pyspark.sql import DataFrame as SparkDataFrame
-from pyspark.sql.functions import regexp_replace
-from pyspark.sql.types import DoubleType
 
+def _remove_digits_from_names(x: pd.Series) -> pd.Series:
+    """Removes digits from strings in name columns."""
+    return x.str.replace(r'\d+', '', regex=True)
 
-def _is_true(x: Column) -> Column:
-    return x == "t"
+def _fix_negative_income(x: pd.Series) -> pd.Series:
+    """Removes negative signs in the income column."""
+    return x.abs()
 
+def _rename_and_format_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Renames columns for consistency and formats datetime and numeric columns."""
+    df['startdate'] = pd.to_datetime(df['start'], errors='coerce')
+    df['stopdate'] = pd.to_datetime(df['stop'], errors='coerce')
+    df.drop(columns=['start', 'stop'], inplace=True)
+    df.rename(columns={'startdate': 'start', 'stopdate': 'stop'}, inplace=True)
+    return df
 
-def _parse_percentage(x: Column) -> Column:
-    x = regexp_replace(x, "%", "")
-    x = x.cast("float") / 100
-    return x
+def _remove_duplicates(df: pd.DataFrame) -> pd.DataFrame:
+    """Removes duplicate rows based on patient and encounter columns."""
+    return df.drop_duplicates(subset=['patient', 'encounter'])
 
+def _fix_reasoncode_format(df: pd.DataFrame) -> pd.DataFrame:
+    """Fixes formatting issues in the reasoncode column."""
+    df['reasoncode'] = df['reasoncode'].str.strip().str.upper()  # Standardizing format
+    return df
 
-def _parse_money(x: Column) -> Column:
-    x = regexp_replace(x, "[$£€]", "")
-    x = regexp_replace(x, ",", "")
-    x = x.cast(DoubleType())
-    return x
+def _fill_missing_gender(df: pd.DataFrame, patient_gender_data: pd.DataFrame) -> pd.DataFrame:
+    """Fills missing gender values from the patient_gender_data."""
+    df = df.merge(patient_gender_data[['patient_id', 'gender']], how='left', on='patient_id', suffixes=('', '_filled'))
+    df['gender'] = df['gender'].fillna(df['gender_filled'])
+    df.drop(columns=['gender_filled'], inplace=True)  # Drop the filled column after merging
+    return df
 
+def preprocess_raw_patient_data(raw_patient_data: pd.DataFrame, raw_patient_gender_data: pd.DataFrame) -> pd.DataFrame:
+    """Preprocesses raw patient data."""
+    raw_patient_data['first_name'] = _remove_digits_from_names(raw_patient_data['first_name'])
+    raw_patient_data['last_name'] = _remove_digits_from_names(raw_patient_data['last_name'])
+    raw_patient_data['maiden_name'] = _remove_digits_from_names(raw_patient_data['maiden_name'])
+    raw_patient_data['income'] = _fix_negative_income(raw_patient_data['income'])
+    raw_patient_data = _fill_missing_gender(raw_patient_data, raw_patient_gender_data)  # Fill missing gender
+    return raw_patient_data
 
-def preprocess_companies(companies: SparkDataFrame) -> tuple[SparkDataFrame, dict]:
-    """Preprocesses the data for companies.
+def preprocess_raw_conditions_data(raw_conditions_data: pd.DataFrame, raw_patient_gender_data: pd.DataFrame) -> pd.DataFrame:
+    """Preprocesses raw conditions data."""
+    raw_conditions_data = _rename_and_format_columns(raw_conditions_data)
+    raw_conditions_data = _remove_duplicates(raw_conditions_data)
+    raw_conditions_data = _fix_reasoncode_format(raw_conditions_data)
+    raw_conditions_data = _fill_missing_gender(raw_conditions_data, raw_patient_gender_data)  # Fill missing gender
+    return raw_conditions_data
 
-    Args:
-        companies: Raw data.
-    Returns:
-        Preprocessed data, with `company_rating` converted to a float and
-        `iata_approved` converted to boolean.
-    """
-    companies = companies.withColumn("iata_approved", _is_true(companies.iata_approved))
-    companies = companies.withColumn("company_rating", _parse_percentage(companies.company_rating))
+def preprocess_raw_encounters_data(raw_encounters_data: pd.DataFrame) -> pd.DataFrame:
+    """Preprocesses raw encounters data."""
+    raw_encounters_data['date'] = pd.to_datetime(raw_encounters_data['date'], errors='coerce')
+    raw_encounters_data['encounter_code'] = raw_encounters_data['encounter_code'].str.strip()
+    raw_encounters_data.rename(columns={'id': 'ENCOUNTER_ID', 'code': 'encounter_code'}, inplace=True)
+    raw_encounters_data = _fix_reasoncode_format(raw_encounters_data)
+    return raw_encounters_data
 
-    # Drop columns that aren't used for model training
-    companies = companies.drop('company_location', 'total_fleet_count')
-    return companies, {"columns": companies.columns, "data_type": "companies"}
+def preprocess_raw_symptoms_data(raw_symptoms_data: pd.DataFrame, raw_patient_gender_data: pd.DataFrame) -> pd.DataFrame:
+    """Preprocesses raw symptoms data."""
+    raw_symptoms_data = raw_symptoms_data[raw_symptoms_data['condition'] == 'lupus']  # Only lupus patients
+    raw_symptoms_data = _remove_duplicates(raw_symptoms_data)
+    raw_symptoms_data.rename(columns={'patient_id': 'patient_ID', 'gender': 'patient_gender'}, inplace=True)
+    raw_symptoms_data = _fill_missing_gender(raw_symptoms_data, raw_patient_gender_data)  # Fill missing gender
+    raw_symptoms_data.drop(columns=['patient_gender'], inplace=True)  # Empty gender column removal
+    return raw_symptoms_data
 
+def preprocess_raw_medications_data(raw_medications_data: pd.DataFrame) -> pd.DataFrame:
+    """Preprocesses raw medications data."""
+    raw_medications_data['date'] = pd.to_datetime(raw_medications_data['date'], errors='coerce')
+    raw_medications_data['reason_description'] = raw_medications_data['reason_description'].str.strip()
+    raw_medications_data = _remove_duplicates(raw_medications_data)
+    raw_medications_data = raw_medications_data.dropna(subset=['reasoncode', 'stopdate'])  # Removing rows with missing reasoncode or stopdate
+    return raw_medications_data
 
-def load_shuttles_to_csv(shuttles: pd.DataFrame) -> pd.DataFrame:
-    """Load shuttles to csv because it's not possible to load excel directly into spark.
-    """
-    return shuttles
+# Main function that will be called in Kedro pipeline
+def process_datasets(raw_patient_data, raw_conditions_data, raw_encounters_data, raw_medications_data, raw_symptoms_data, raw_patient_gender_data):
+    """Processes all raw data and returns cleaned datasets."""
+    cleaned_patient_data = preprocess_raw_patient_data(raw_patient_data, raw_patient_gender_data)
+    cleaned_conditions_data = preprocess_raw_conditions_data(raw_conditions_data, raw_patient_gender_data)
+    cleaned_encounters_data = preprocess_raw_encounters_data(raw_encounters_data)
+    cleaned_symptoms_data = preprocess_raw_symptoms_data(raw_symptoms_data, raw_patient_gender_data)
+    cleaned_medications_data = preprocess_raw_medications_data(raw_medications_data)
 
+    # You can also save the cleaned dataframes here if required
+    cleaned_patient_data.to_csv("cleaned_patient_data.csv", index=False)
+    cleaned_conditions_data.to_csv("cleaned_conditions_data.csv", index=False)
+    # ...
 
-def preprocess_shuttles(shuttles: SparkDataFrame) -> SparkDataFrame:
-    """Preprocesses the data for shuttles.
-
-    Args:
-        shuttles: Raw data.
-    Returns:
-        Preprocessed data, with `price` converted to a float and `d_check_complete`,
-        `moon_clearance_complete` converted to boolean.
-    """
-    shuttles = shuttles.withColumn("d_check_complete", _is_true(shuttles.d_check_complete))
-    shuttles = shuttles.withColumn("moon_clearance_complete", _is_true(shuttles.moon_clearance_complete))
-    shuttles = shuttles.withColumn("price", _parse_money(shuttles.price))
-
-    # Drop columns that aren't used for model training
-    shuttles = shuttles.drop('shuttle_location', 'engine_type', 'engine_vendor', 'cancellation_policy')
-    return shuttles
-
-
-def preprocess_reviews(reviews: SparkDataFrame) -> SparkDataFrame:
-    # Drop columns that aren't used for model training
-    reviews = reviews.drop('review_scores_comfort', 'review_scores_amenities', 'review_scores_trip', 'review_scores_crew', 'review_scores_location', 'review_scores_price', 'number_of_reviews', 'reviews_per_month')
-    return reviews
-
-
-def create_model_input_table(
-    shuttles: SparkDataFrame, companies: SparkDataFrame, reviews: SparkDataFrame
-) -> SparkDataFrame:
-    """Combines all data to create a model input table.
-
-    Args:
-        shuttles: Preprocessed data for shuttles.
-        companies: Preprocessed data for companies.
-        reviews: Raw data for reviews.
-    Returns:
-        Model input table.
-
-    """
-    # Rename columns to prevent duplicates
-    shuttles = shuttles.withColumnRenamed("id", "shuttle_id")
-    companies = companies.withColumnRenamed("id", "company_id")
-
-    rated_shuttles = shuttles.join(reviews, "shuttle_id", how="left")
-    model_input_table = rated_shuttles.join(companies, "company_id", how="left")
-    model_input_table = model_input_table.dropna()
-    return model_input_table
+    return cleaned_patient_data, cleaned_conditions_data, cleaned_encounters_data, cleaned_symptoms_data, cleaned_medications_data
