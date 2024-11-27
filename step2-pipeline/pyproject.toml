@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 requires-python = ">=3.9"
-name = "medicaldatapipeline"
+name = "step2_pipeline"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [project.scripts]
-"medicaldatapipeline" = "medicaldatapipeline.__main__:main"
+"step2-pipeline" = "step2_pipeline.__main__:main"
 
 [project.entry-points."kedro.hooks"]
 
@@ -44,24 +44,24 @@ dev = [
 ]
 
 [tool.setuptools.dynamic]
-version = {attr = "medicaldatapipeline.__version__"}
+version = {attr = "step2_pipeline.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
 namespaces = false
 
 [tool.kedro]
-package_name = "medicaldatapipeline"
-project_name = "MedicalDataPipeline"
+package_name = "step2_pipeline"
+project_name = "Step2_Pipeline"
 kedro_init_version = "0.19.10"
 tools = "['Linting', 'Testing', 'Custom Logging', 'Documentation', 'Data Structure', 'PySpark', 'Kedro Viz']"
-example_pipeline = "True"
+example_pipeline = "False"
 source_dir = "src"
 
 [tool.pytest.ini_options]
 addopts = """
 --cov-report term-missing \
---cov src/medicaldatapipeline -ra"""
+--cov src/step2_pipeline -ra"""
 
 [tool.coverage.report]
 fail_under = 0
@@ -86,4 +86,4 @@ select = [
 ignore = ["E501"]  # Ruff format takes care of line-too-long
 
 [tool.kedro_telemetry]
-project_id = "ee9deb010e034ce0a3095e3d5bb5d451"
+project_id = "82a584f497be4d1298ffe59a3c948888"
