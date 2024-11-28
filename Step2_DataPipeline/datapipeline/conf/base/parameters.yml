@@ -1,0 +1,38 @@
+patient_column_mapping:
+  first: first_name
+  maiden: maiden_name
+  last: last_name
+  income: annual_income
+  gender: sex
+  birthdate: birth_date
+  ssn: social_security_number
+  zip: zipcode
+  lat: latitude
+  lon: longitude
+
+
+conditions_column_mapping:
+  start: start_date
+  end: end_date
+  code: condition_code
+  description: condition_description
+  patient: patient_id
+  
+
+encounters_column_mapping:
+  id: encounter_id
+  start: start_datetime
+  end: end_datetime
+  patient: patient_id
+  code: encounter_code
+
+symptoms_column_mapping:
+  symptoms: observations  # Modify based on Tuva model
+  patient: patient_id
+
+medications_column_mapping:
+  start: start_datetime
+  end: end_datetime
+  patient: patient_id
+  encounter: encounter_id
+  code: medication_code
