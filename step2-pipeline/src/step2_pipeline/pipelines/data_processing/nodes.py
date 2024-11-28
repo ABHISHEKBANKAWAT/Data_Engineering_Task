@@ -84,8 +84,8 @@ def process_datasets(raw_patient_data, raw_conditions_data, raw_encounters_data,
     cleaned_medications_data = preprocess_raw_medications_data(raw_medications_data)
 
     # You can also save the cleaned dataframes here if required
-    cleaned_patient_data.to_csv("cleaned_patient_data.csv", index=False)
-    cleaned_conditions_data.to_csv("cleaned_conditions_data.csv", index=False)
+    cleaned_patient_data.to_csv(r"C:\Users\ABHISHEK BANKAWAT\Desktop\Data_Engineering_Task\step2-pipeline\data\02_intermediate\cleaned_patient_data.csv", index=False)
+    cleaned_conditions_data.to_csv(r"C:\Users\ABHISHEK BANKAWAT\Desktop\Data_Engineering_Task\step2-pipeline\data\02_intermediate\cleaned_conditions_data.csv", index=False)
     # ...
 
     return cleaned_patient_data, cleaned_conditions_data, cleaned_encounters_data, cleaned_symptoms_data, cleaned_medications_data

@@ -4,31 +4,31 @@ raw_patient_data:
   sql: "SELECT * FROM patients"
   credentials: sqlite_db
 
-conditions_data:
+raw_conditions_data:
   type: pandas.SQLTableDataset
   table_name: conditions
   sql: "SELECT * FROM conditions"
   credentials: sqlite_db
   
-encounters_data:
+raw_encounters_data:
   type: pandas.SQLTableDataset
   table_name: encounters
   sql: "SELECT * FROM encounters"
   credentials: sqlite_db
 
-medications_data:
+raw_medications_data:
   type: pandas.SQLTableDataset
   table_name: medications
   sql: "SELECT * FROM medications"
   credentials: sqlite_db
 
-symptoms_data:
+raw_symptoms_data:
   type: pandas.SQLTableDataset
   table_name: symptoms
   sql: "SELECT * FROM symptoms"
   credentials: sqlite_db
 
-patient_gender_data:
+raw_patient_gender_data:
   type: pandas.SQLTableDataset
   table_name: patient_gender
   sql: "SELECT * FROM patient_gender"
