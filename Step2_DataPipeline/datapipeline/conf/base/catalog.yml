@@ -1,0 +1,64 @@
+raw_patient_data:
+  type: pandas.SQLTableDataset
+  table_name: patients
+  credentials: sqlite_db
+  save_args:
+    if_exists: replace
+
+raw_conditions_data:
+  type: pandas.SQLTableDataset
+  table_name: conditions
+  credentials: sqlite_db
+  save_args:
+      if_exists: replace
+  
+raw_encounters_data:
+  type: pandas.SQLTableDataset
+  table_name: encounters
+  credentials: sqlite_db
+  save_args:
+      if_exists: replace
+
+raw_medications_data:
+  type: pandas.SQLTableDataset
+  table_name: medications
+  credentials: sqlite_db
+  save_args:
+      if_exists: replace
+      
+raw_symptoms_data:
+  type: pandas.SQLTableDataset
+  table_name: symptoms
+  credentials: sqlite_db
+  save_args:
+      if_exists: replace
+      
+raw_patient_gender_data:
+  type: pandas.SQLTableDataset
+  table_name: patient_gender
+  credentials: sqlite_db
+  save_args:
+      if_exists: replace
+
+      
+# clean_patient_data:
+#   type: pandas.CSVDataSet
+#   filepath: data/02_intermediate/clean_patient_data.csv
+#   save_args:
+#       if_exists: replace
+      
+# clean_conditions_data:
+#   type: pandas.CSVDataSet
+#   filepath: data/02_intermediate/clean_conditions_data.csv
+
+# clean_encounters_data:
+#   type: pandas.CSVDataSet
+#   filepath: data/02_intermediate/clean_encounters_data.csv
+
+# clean_symptoms_data:
+#   type: pandas.CSVDataSet
+#   filepath: data/02_intermediate/clean_symptoms_data.csv
+
+# clean_medication_data:
+#   type: pandas.CSVDataSet
+#   filepath: data/02_intermediate/clean_medication_data.csv
