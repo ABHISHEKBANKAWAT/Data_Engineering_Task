@@ -8,7 +8,6 @@ This repository contains a Kedro-based data pipeline for [brief description of w
 2. [Setup](#setup)
 3. [Running the Pipeline](#running-the-pipeline)
 4. [Datasets](#datasets)
-5. [License](#license)
 
 ## Installation
 
@@ -62,3 +61,6 @@ Once you've installed the dependencies and configured your datasets, you can run
 
 ```bash
 kedro run
+
+
+
