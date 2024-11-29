@@ -1,34 +1,34 @@
 raw_patient_data:
   type: pandas.SQLTableDataset
-  table_name: patients
+  table_name: raw_patients_data
   credentials: sqlite_db
   save_args:
     if_exists: replace
 
 raw_conditions_data:
   type: pandas.SQLTableDataset
-  table_name: conditions
+  table_name: raw_conditions_data
   credentials: sqlite_db
   save_args:
     if_exists: replace
 
 raw_encounters_data:
   type: pandas.SQLTableDataset
-  table_name: encounters
+  table_name: raw_encounters_data
   credentials: sqlite_db
   save_args:
     if_exists: replace
 
 raw_medications_data:
   type: pandas.SQLTableDataset
-  table_name: medications
+  table_name: raw_medications_data
   credentials: sqlite_db
   save_args:
     if_exists: replace
 
 raw_symptoms_data:
   type: pandas.SQLTableDataset
-  table_name: symptoms
+  table_name: raw_symptoms_data
   credentials: sqlite_db
   save_args:
     if_exists: replace

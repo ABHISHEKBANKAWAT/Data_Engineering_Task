@@ -12,27 +12,35 @@ patient_column_mapping:
 
 
 conditions_column_mapping:
-  start: start_date
-  end: end_date
-  code: condition_code
-  description: condition_description
+  start: onset_date
+  end: resolved_date
+  code: condition_id
+  description: description
   patient: patient_id
+  encounter: encounter_id
   
 
 encounters_column_mapping:
   id: encounter_id
-  start: start_datetime
-  end: end_datetime
+  start: encounter_start_date
+  stop: encounter_end_date
   patient: patient_id
   code: encounter_code
 
+
 symptoms_column_mapping:
-  symptoms: observations  # Modify based on Tuva model
+  num_syptoms: num_observations 
+  Symtom1: obsersation1
+  Symtom2: obsersation2
+  Symtom3: obsersation3
+  Symtom4: obsersation4
   patient: patient_id
+
+
 
 medications_column_mapping:
   start: start_datetime
   end: end_datetime
   patient: patient_id
   encounter: encounter_id
-  code: medication_code
+  code: medication_id

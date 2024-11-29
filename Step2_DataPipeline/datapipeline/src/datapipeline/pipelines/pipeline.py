@@ -5,6 +5,7 @@ from .nodes import (
     preprocess_encounters_data,
     preprocess_symptoms_data,
     preprocess_medication_data,
+    create_master_database
 )
 
 
@@ -40,6 +41,18 @@ def create_pipeline(**kwargs) -> Pipeline:
                 inputs=["raw_medications_data", "params:medications_column_mapping"],
                 outputs="clean_medications_data",
                 name="preprocess_medication_data_node",
+            ),
+            node(
+                func=create_master_database,
+                inputs=[
+                    "clean_patient_data",
+                    "clean_conditions_data",
+                    "clean_encounters_data",
+                    "clean_symptoms_data",
+                    "clean_medications_data",
+                ],
+                outputs=None,  # No in-memory output since the function saves to a file
+                name="create_master_database_node",
             ),
         ]
     )

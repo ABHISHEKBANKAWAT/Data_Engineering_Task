@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: medical_data
+    database: main
+    schema: MedicalData
+    tables:
+      - name: raw_encounters_data
+      - name: raw_patients_data
+      - name: raw_conditions_data
+      - name: raw_medications_data
+      - name: raw_symptoms_data
