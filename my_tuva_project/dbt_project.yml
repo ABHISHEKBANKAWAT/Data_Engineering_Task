@@ -1,4 +1,3 @@
-
 # Name your project! Project names should contain only lowercase characters
 # and underscores. A good package name should reflect your organization's
 # name or the intended use of these models
@@ -31,10 +30,13 @@ clean-targets:         # directories to be removed by `dbt clean`
 # directory as views. These settings can be overridden in the individual model
 # files using the `{{ config(...) }}` macro.
 models:
-  medical_data:
-    staging:
-      +materialized: view
+  my_tuva_project:
     standardized:
-      +database: StandardDB  # Target database
-      +schema: standard
-      +materialized: table
+      encounters:  # Match the model name without `.sql`
+        +alias: standard_encounters
+      medications:
+        +alias: standard_medications
+      symptoms:
+        +alias: standard_symptoms
+      patients:
+        +alias: standard_patients

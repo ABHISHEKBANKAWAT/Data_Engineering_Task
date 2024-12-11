@@ -1,10 +1,7 @@
-{{ config(
-    materialized='table',
-    alias='standardized_encounters'  
-) }}
+
 
 with raw_encounters as (
-    select * from {{ source('medical_data', 'raw_encounters_data') }}
+    select * from {{ source('MedicalData', 'raw_encounters_data') }}
 )
 
 select
@@ -15,3 +12,4 @@ select
     code as encounter_code,
     current_timestamp as standardized_at
 from raw_encounters
+

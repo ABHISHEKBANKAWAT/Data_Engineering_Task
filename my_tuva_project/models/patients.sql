@@ -1,5 +1,7 @@
+
+
 with raw_patients as (
-    select * from {{ source('medical_data', 'raw_patients_data') }}
+    select * from {{ source('MedicalData', 'raw_patients_data') }}
 )
 
 select

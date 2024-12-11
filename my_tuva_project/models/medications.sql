@@ -1,5 +1,7 @@
+
+
 with raw_medications as (
-    select * from {{ source('medical_data', 'raw_medications_data') }}
+    select * from {{ source('MedicalData', 'raw_medications_data') }}
 )
 
 select

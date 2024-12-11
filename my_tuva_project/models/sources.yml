@@ -1,9 +1,9 @@
 version: 2
 
 sources:
-  - name: medical_data
-    database: main
-    schema: MedicalData
+  - name: MedicalData
+    database: MedicalData
+    schema: main
     tables:
       - name: raw_encounters_data
       - name: raw_patients_data
