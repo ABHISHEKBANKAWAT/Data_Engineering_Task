@@ -1,7 +1,7 @@
 ﻿# Data_Engineering_Task
 # Kedro Data Pipeline
 
-This repository contains a Kedro-based data pipeline for [brief description of what your pipeline does]. The pipeline processes [brief description of the input data] and outputs [brief description of the output].
+This repository contains a Kedro-based data pipeline.
 
 ## Table of Contents
 1. [Installation](#installation)
